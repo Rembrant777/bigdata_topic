@@ -6,5 +6,6 @@
 * 
 
 ## References 
-* [hadoop docker deployment](https://github.com/big-data-europe/docker-hadoop)
+!! thanks to this repo it really helps a lot to shrink the time I spent on hadoop cluster deployment!!
+* [hadoop docker deployment](https://github.com/big-data-europe/docker-hadoop) 
 * [udemy tutorial](https://www.udemy.com/course/the-ultimate-hands-on-hadoop-tame-your-big-data)
