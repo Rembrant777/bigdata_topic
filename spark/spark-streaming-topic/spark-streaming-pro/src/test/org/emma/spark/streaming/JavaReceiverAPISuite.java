@@ -54,6 +54,20 @@ public class JavaReceiverAPISuite implements Serializable {
 
             Thread.sleep(200);
             for (int i = 0; i < 6; i++) {
+                // here call test server's send operaiton
+                // to feed test server's inner queue
+                // and when test server established the connection to the clien t
+                // and also finds out that the queue contains elements of characters
+                // it will send the contents from the queue to the client via the socket connection
+
+
+                // and the socket connection is connected to the client endpoint that we created
+                // in the spark streaming's receiver side, in this way,
+                // the receiver consumeds the character via the socket from the serverside
+                //then passing it to the current JavaSparkStreaming's retrieved DStream to execute the word count operation
+                // to update the global; thread-safe dataCounter
+
+                // and once the dataCounter collect enough characters it will invoke shutdown spark streaming job
                 testServer.send(i + "\n"); // append \n here to make sure these are separated lines
                 Thread.sleep(100);
             }
