@@ -59,7 +59,7 @@ public class RedisBackendCacheIT {
     @BeforeAll
     public static void setUp() {
         jedis = ThreadLocal.withInitial(() -> {
-
+            return null;
         });
     }
 
