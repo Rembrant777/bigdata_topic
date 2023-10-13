@@ -35,6 +35,12 @@ public class TImeServer {
                 // This is because the 'accept' method acts as a blocking point where all the threads
                 // must be synchronized within this method.
                 // No single thread can change the order in the queue to retrieve the accepted sockets in a disorderly manner.
+                // ...
+                // actually it is not the accept raise the 'synchronzied'
+                // it is the io operation of thec client.
+                // suppose one client connect and exchange data via server , and the server need to get blocked
+                // to wait for the one of the specific client to write response
+                // at the same time other remained clients have to blocked and wait
                 socket = server.accept();
                 // same logic that implemented in the TimeServerHandler: that every time receives a 'QUERY TIME ORDER'
                 // it will write a timestamp value and sent to the client side.
