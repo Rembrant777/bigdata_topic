@@ -120,7 +120,7 @@ public class MultiplexerTimeServer implements Runnable {
             } // handle accept operation
 
             // cuz, in the accept key selection's process logic, if there are clients try to get connect to the server
-            // and retrieve by the server socket's accept method, this socket channel will be registered into selector with the type of
+            // and retrieve by the server socket accept method, this socket channel will be registered into selector with the type of
             // SelectionKey#OP_READ
             // so here there is possible to retrieve the SelectionKey that with the type of SelectionKey#OP_READ
             if (key.isReadable()) {

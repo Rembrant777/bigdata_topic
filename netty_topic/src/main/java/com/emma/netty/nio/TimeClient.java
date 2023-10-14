@@ -7,6 +7,7 @@ import java.util.Objects;
 
 public class TimeClient {
     private static final Logger LOG = LoggerFactory.getLogger(TimeClient.class);
+
     public static void main(String[] args) {
         int port = 8080;
         if (Objects.nonNull(args) && args.length > 0) {
@@ -17,6 +18,9 @@ public class TimeClient {
             }
         }
 
-        new Thread(new TimeClientHandle("localhost", port), "TimeClient-001");
+        new Thread(
+                new TimeClientHandle("localhost", port),
+                "TimeClient-001")
+                .start();
     }
 }

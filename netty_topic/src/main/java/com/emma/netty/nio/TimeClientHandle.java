@@ -86,20 +86,6 @@ public class TimeClientHandle implements Runnable {
         }
     }
 
-    private void handleInput(SelectionKey key) {
-        if (key.isValid()) {
-            // here check whether the connection is ok
-            SocketChannel sc = (SocketChannel) key.channel();
-            if (sc.finishConnect()) {
-                sc.register(selector, SelectionKey.OP_READ) ;
-                doWrite(sc);
-            } else {
-                LOG.error("#handleInput connection failed, process exit");
-                System.exit(-1);
-            }
-        }
-    }
-
     private void doConnect() throws IOException {
         if (socketChannel.connect(new InetSocketAddress(host, port))) {
             socketChannel.register(selector, SelectionKey.OP_READ);
@@ -110,7 +96,7 @@ public class TimeClientHandle implements Runnable {
     }
 
     private void doWrite(SocketChannel sc) throws IOException {
-        byte [] req = "QUERY TIME ORDER".getBytes();
+        byte[] req = "QUERY TIME ORDER".getBytes();
         ByteBuffer writeBuffer = ByteBuffer.allocate(req.length);
         writeBuffer.put(req);
         // position <- 0
@@ -121,6 +107,52 @@ public class TimeClientHandle implements Runnable {
         if (!writeBuffer.hasRemaining()) {
             LOG.info("#doWrite send order to server succeed.");
         }
+    }
 
+    private void handleInput(SelectionKey key) throws IOException {
+        LOG.info("#handleInput recv key {}", key.isValid());
+        if (key.isValid()) {
+            // check connection is ok
+            SocketChannel sc = (SocketChannel) key.channel();
+            if (key.isConnectable()) {
+                // isConnectable is OP_CONNECT state validation
+                if (sc.finishConnect()) {
+                    LOG.info("#handleInput connection success");
+                    sc.register(selector, SelectionKey.OP_READ);
+                    doWrite(sc);
+                } else {
+                    LOG.warn("#handleInput connect failed, return!");
+                    System.exit(-1);
+                }
+            }
+
+            if (key.isReadable()) {
+                // isConnectable is OP_READ state validation
+                ByteBuffer readBuffer = ByteBuffer.allocate(1024);
+                int readBytes = sc.read(readBuffer);
+                if (readBytes > 0) {
+                    readBuffer.flip();
+                    byte [] bytes = new byte [readBuffer.remaining()];
+                    readBuffer.get(bytes);
+                    String body = new String(bytes, "UTF-8");
+                    LOG.info("#handleInput content : {}", body);
+                    if (Objects.isNull(body) || body.trim().length() == 0 || body.contains("BAD")) {
+                        LOG.info("#handleInput content {}", body);
+                    } else {
+                        LOG.info("#handleInput content {}", body);
+                        System.out.println("#handleInput content: " +  body);
+                        this.stop = true;
+                    }
+                } else if (readBytes < 0) {
+                    key.cancel();
+                    sc.close();
+                } else {
+                    // skip, read 0 byte just ignore
+                }
+            }
+        } else {
+            LOG.warn("#handleInput SelectionKey is invalid, return!");
+            return;
+        }
     }
 }
