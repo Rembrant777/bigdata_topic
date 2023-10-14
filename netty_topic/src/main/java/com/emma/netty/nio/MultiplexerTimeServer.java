@@ -46,15 +46,21 @@ public class MultiplexerTimeServer implements Runnable {
 
     @Override
     public void run() {
+        // inside run function traverse each registered item in the scope of the selector
         while (!stop) {
             try {
-                // set selector select operation's timeout 1000s, in the given period any client's SelectionKey#OP_ACCEPT
+                // here 1000 param means select operation (which checks which action operation is activated)
+                // every 1000 milliseconds
                 selector.select(1000);
 
-                // retrieve the set of accept operation's keys in a set
+                // ok 1 second time up, check how many operation state bits is activated and collected by the selector
+                // return by selectedKeys();
                 Set<SelectionKey> selectionKeys = selector.selectedKeys();
 
                 // build iterator based on the selection key set
+                // each SelectionKey is a combination of
+                // 1. operation key value: {operation key value like read, write, connect, accept}
+                // 2.
                 Iterator<SelectionKey> it = selectionKeys.iterator();
                 SelectionKey key = null;
 
@@ -115,7 +121,8 @@ public class MultiplexerTimeServer implements Runnable {
                 // set non-block to the socket channel
                 sc.configureBlocking(false);
 
-                // add new connection to the selector
+                // register current channel (socket server channel) to the selector;
+                // with monitoring the operation big = SelectionKey#OP_ACCEPT
                 sc.register(selector, SelectionKey.OP_READ);
             } // handle accept operation
 
@@ -129,17 +136,24 @@ public class MultiplexerTimeServer implements Runnable {
 
                 // allocate 1024 bytes space for new created ByteBuffer instance
                 // limit <- 1024
+
+                /**
+                 * here we create an instance of ByteBuffer, cuz we do not know
+                 * the client side's byte streaming capacity.
+                 * so we allocate a 1M space to cache to be received byte array.
+                 */
                 ByteBuffer readBuffer = ByteBuffer.allocate(1024);
-
                 // read data from the socket's channel space to the ByteBuffer's inner storage space
-                int readBytes = sc.read(readBuffer);
+                int readBytesLen = sc.read(readBuffer);
 
-                if (readBytes > 0) {
+                if (readBytesLen > 0) {
                     // position <- 0
-                    // limit <- readBytes len
+                    // limit <- [0, readBytesLen - 1] for next round's read operations
+                    // next round read operation will read from [0, limit = (readBytesLen - 1)]
                     readBuffer.flip();
 
                     // remaining <- limit - position
+                    // remaining value = limit
                     byte [] bytes = new byte [readBuffer.remaining()];
                     // data from channel -> ByteBuffer -> byte [] bytes array
                     readBuffer.get(bytes);
@@ -148,7 +162,7 @@ public class MultiplexerTimeServer implements Runnable {
                     String currentTS = "QUERY TIME ORDER".equalsIgnoreCase(body)
                             ? new Date(System.currentTimeMillis()).toString() : "BAD ORDER";
                     doWrite(sc, currentTS);
-                } else if (readBytes < 0) {
+                } else if (readBytesLen < 0) {
                     // close channel
                     LOG.info("#T-{}  close channel", Thread.currentThread().getName());
                     key.cancel();

@@ -29,6 +29,7 @@ public class TimeClientHandle implements Runnable {
         this.port = port;
 
         try {
+            // here ! we create ! Reactor Thread !!!
             selector = Selector.open();
             socketChannel = SocketChannel.open();
             socketChannel.configureBlocking(false);
