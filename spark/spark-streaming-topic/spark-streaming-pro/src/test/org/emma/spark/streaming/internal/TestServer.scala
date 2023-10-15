@@ -1,38 +1,40 @@
-package org.emma.spark.streaming
+package org.emma.spark.streaming.internal
 
 import org.apache.hadoop.shaded.com.nimbusds.jose.util.StandardCharset
-import org.emma.spark.streaming.internal.Logging
 import org.junit.Assert.fail
 
 import java.io.{BufferedWriter, OutputStreamWriter}
 import java.net.{ServerSocket, Socket, SocketException}
 import java.util.concurrent.{ArrayBlockingQueue, CountDownLatch, TimeUnit}
 
-/** A server implemented for testing cases.
- * TestServer will setup server with random port and passing data as input stream
- * for spark jobs to subscribe and consume
- **/
+/**
+ * A server implemented for testing cases. TestServer will setup server with random port and
+ * passing data as input stream for spark jobs to subscribe and consume
+ */
 class TestServer(portToBind: Int = 0) extends Logging {
   val queueCapacity: Int = 100
   val queue = new ArrayBlockingQueue[String](queueCapacity)
-
   val serverSocket = new ServerSocket(portToBind)
 
   private val startLatch = new CountDownLatch(1)
 
   /**
    * method of executeSocketServer executes
-   * 1. poll data from queue and wrap data into message sent message to the connected/accepted socket clients
-   * 2. also distinguish the connection times, the first connection is spark job setup signal
-   *    dataset sending operaiton only happens after the spark job setup and get ready to process data.
-   * 3.
+   *   1. poll data from queue and wrap data into message sent message to the connected/accepted
+   *      socket clients 2. also distinguish the connection times, the first connection is spark
+   *      job setup signal dataset sending operaiton only happens after the spark job setup and
+   *      get ready to process data. 3.
    */
-  def executeSocketServer(serverSocket: ServerSocket, queue: ArrayBlockingQueue[String], startLatch: CountDownLatch): Unit = {
+  def executeSocketServer(
+      serverSocket: ServerSocket,
+      queue: ArrayBlockingQueue[String],
+      startLatch: CountDownLatch): Unit = {
     while (true) {
       logInfo("#executeSocketServer Accepting connections on port " + port)
       val clientSocket = serverSocket.accept()
       if (startLatch.getCount == 1) {
-        // just skip this connection, this connection is the signal to let TestServer know that client side (spark job) is just seting up
+        // just skip this connection, this connection is the signal to let TestServer
+        // know that client side (spark job) is just set up
         // not get ready to subscribe data and consume it yet.
         if (!clientSocket.isClosed) {
           clientSocket.close()
@@ -91,9 +93,8 @@ class TestServer(portToBind: Int = 0) extends Logging {
   }
 
   /**
-   * Method defined for handling wait until the server starts.
-   * This method will return true if the server starts in "millis" milliesecionds.
-   * Otherwise, return false to indicate it's timeout.
+   * Method defined for handling wait until the server starts. This method will return true if the
+   * server starts in "millis" milliesecionds. Otherwise, return false to indicate it's timeout.
    */
   def waitForStart(millis: Long): Boolean = {
     // we will create a test connection to the server so that we can make sure it has started.
@@ -108,8 +109,14 @@ class TestServer(portToBind: Int = 0) extends Logging {
     }
   }
 
-  def send(msg: String):Unit = {queue.put(msg)}
-  def stop() : Unit = {
+  def startState(): Boolean = {
+    (startLatch.getCount == 0)
+  }
+
+  def send(msg: String): Unit = {
+    queue.put(msg)
+  }
+  def stop(): Unit = {
     servingThread.interrupt()
   }
   def port: Int = serverSocket.getLocalPort

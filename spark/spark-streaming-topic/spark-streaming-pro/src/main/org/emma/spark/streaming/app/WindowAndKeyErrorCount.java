@@ -1,4 +1,4 @@
-package org.emma.spark.streaming;
+package org.emma.spark.streaming.app;
 
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.function.FlatMapFunction;
