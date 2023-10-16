@@ -34,6 +34,7 @@ public class ZookeeperTestContainerIntegrationTest {
     public void testSetup() {
         String TARGET_ZK_INTERNAL_URL = "zookeeper:2181";
         Assertions.assertNotNull(zookeeperTestContainer);
+        Assertions.assertTrue(zookeeperTestContainer.isCreated());
         String zkInternalUrl = zookeeperTestContainer.getInternalUrl();
         Assertions.assertTrue(StringUtils.isNotBlank(zkInternalUrl)
                 && zkInternalUrl.equals(TARGET_ZK_INTERNAL_URL));

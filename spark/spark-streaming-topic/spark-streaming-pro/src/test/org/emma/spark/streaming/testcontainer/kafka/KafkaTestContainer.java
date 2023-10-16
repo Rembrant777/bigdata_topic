@@ -74,7 +74,7 @@ public class KafkaTestContainer extends GenericContainer<KafkaTestContainer> {
 
     @Override
     protected void doStart() {
-        withCommand("sh", "-c", "while [ !-f " + STARTER_SCRIPT + " ]; do sleep 0.1; done; " + STARTER_SCRIPT);
+        withCommand("sh", "-c", "while [ ! -f " + STARTER_SCRIPT + " ]; do sleep 0.1; done; " + STARTER_SCRIPT);
         super.doStart();
     }
 
@@ -101,6 +101,7 @@ public class KafkaTestContainer extends GenericContainer<KafkaTestContainer> {
         command += "/etc/confluent/docker/configure \n";
         command += "/etc/confluent/docker/launch \n";
 
+        LOG.info("#containerIsStarting command {}", command);
         copyFileToContainer(
                 Transferable.of(command.getBytes(StandardCharsets.UTF_8), 700),
                 STARTER_SCRIPT);
