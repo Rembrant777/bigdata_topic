@@ -3,6 +3,8 @@ package org.emma.spark.streaming.receiver;
 import com.google.common.io.Closeables;
 import org.apache.spark.storage.StorageLevel;
 import org.apache.spark.streaming.receiver.Receiver;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -17,6 +19,8 @@ import java.nio.charset.StandardCharsets;
  * org.apache.spark.streaming.JavaReceiverAPISuite.JavaSocketReceiver#JavaSocketReceiver
  */
 public class JavaSocketReceiver extends Receiver<String> {
+    private static final Logger LOG = LoggerFactory.getLogger(JavaSocketReceiver.class);
+
     private String host = null;
     private int port = -1;
 
@@ -43,6 +47,7 @@ public class JavaSocketReceiver extends Receiver<String> {
 
           try {
               socket = new Socket(host, port);
+              LOG.info("#receive is socket connected ? {}", socket.isConnected());
               in = new BufferedReader(new InputStreamReader(socket.getInputStream(), StandardCharsets.UTF_8));
               String userInput;
               while ((userInput = in.readLine()) != null) {

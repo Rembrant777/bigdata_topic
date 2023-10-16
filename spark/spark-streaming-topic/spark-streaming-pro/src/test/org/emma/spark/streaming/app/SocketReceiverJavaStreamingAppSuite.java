@@ -1,9 +1,10 @@
-package org.emma.spark.streaming;
+package org.emma.spark.streaming.app;
 
 import org.apache.spark.streaming.Duration;
 import org.apache.spark.streaming.api.java.JavaDStream;
 import org.apache.spark.streaming.api.java.JavaReceiverInputDStream;
 import org.apache.spark.streaming.api.java.JavaStreamingContext;
+import org.emma.spark.streaming.internal.TestServer;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -16,10 +17,12 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
- * Java Spark Streaming Suite Codes refered from
- * org.apache.spark.streaming.JavaReceiverAPISuite from spark 3.5 source code.
+ * Spark Java Streaming Application
+ * 1. consume data via Socket connection that produced by {@link TestServer}.
+ * 2. data converted from socket message via Spark Streaming customized receiver.
+ * 3. simple DStream & RDD operation.
  */
-public class JavaReceiverAPISuite implements Serializable {
+public class SocketReceiverJavaStreamingAppSuite implements Serializable {
     @Before
     public void setUp() {
         System.clearProperty("spark.streaming.clock");

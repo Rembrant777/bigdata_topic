@@ -1,4 +1,4 @@
-package org.emma.spark.streaming;
+package org.emma.spark.streaming.testcontainer;
 
 import org.apache.directory.api.util.Strings;
 import org.emma.spark.streaming.redis.Cache;

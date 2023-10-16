@@ -1,4 +1,4 @@
-package org.emma.spark.streaming;
+package org.emma.spark.streaming.app;
 
 import com.twitter.chill.KryoSerializer;
 import org.apache.spark.SparkConf;
