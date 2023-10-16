@@ -10,6 +10,7 @@ import org.apache.spark.streaming.api.java.JavaReceiverInputDStream;
 import org.apache.spark.streaming.api.java.JavaStreamingContext;
 import org.emma.spark.streaming.converter.JsonConverter;
 import org.emma.spark.streaming.internal.TestServer;
+import org.emma.spark.streaming.receiver.JavaSocketReceiver;
 import org.emma.spark.streaming.utils.RDDUtils;
 import org.junit.After;
 import org.junit.Before;
@@ -27,6 +28,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class AppErrorCountJavaStreamingAppSuite implements Serializable {
     private static final Logger LOG = LoggerFactory.getLogger(AppErrorCountJavaStreamingAppSuite.class);
@@ -44,7 +47,7 @@ public class AppErrorCountJavaStreamingAppSuite implements Serializable {
     @Test
     public void testAppErrorCountJavaStreamingApp() throws InterruptedException {
         // Create a TestServer to generate upstreaming data
-        TestServer testServer = new TestServer(0);
+        TestServer testServer = new TestServer(8910);
         testServer.start();
 
         // --- here add Spark Streaming App Logic ---
@@ -52,21 +55,27 @@ public class AppErrorCountJavaStreamingAppSuite implements Serializable {
                 .setMaster("local[2]")
                 .setAppName("AppErrorCountApp")
                 .set("spark.serializer", KryoSerializer.class.getName());
+
         JavaStreamingContext jssc = new JavaStreamingContext(sparkConf, new Duration(1000));
 
-        jssc.checkpoint("/tmp/AppErrorCountApp/checkpoint");
+        jssc.checkpoint("/tmp/AppErrorCountApp");
 
         JavaReceiverInputDStream<String> dStreamLines = jssc
-                .socketTextStream("localhost", testServer.port());
+                .receiverStream(new JavaSocketReceiver("localhost", testServer.port()));
 
-
-        dStreamLines.map(str -> {
+        dStreamLines
+                .filter(Objects::nonNull)
+                .map(str -> {
                     if (Objects.nonNull(str) && str.length() > 0) {
+                        LOG.info("#map recv str {}", str);
                         return Arrays.stream(str.split(" ")).iterator();
                     } else {
+                        LOG.info("#map recv empty str");
                         return null;
                     }
-                }).flatMap(item -> item)
+                })
+                .filter(Objects::nonNull)
+                .flatMap(item -> item)
                 .mapToPair(item -> new Tuple2<>(item, 1))
                 .updateStateByKey(new Function2<List<Integer>, Optional<Integer>, Optional<Integer>>() {
                     @Override
@@ -88,15 +97,17 @@ public class AppErrorCountJavaStreamingAppSuite implements Serializable {
                         int partitionId = TaskContext.get().partitionId();
                         LOG.info("#foreachPartition partition id {}, partition iterator non-null status {}, has next status {}",
                                 partitionId, Objects.nonNull(partition), partition.hasNext());
-                        cache.put(partitionId, partition);
+                        if (Objects.nonNull(partition) && partition.hasNext()) {
+                            cache.put(partitionId, partition);
+                        }
                     });
                     LOG.info("#foreachRDD recv map len {}", cache.size());
-                    for (Map.Entry<Integer, Iterator<SumRecordItem>> entry : cache.entrySet()) {
-                        RDDUtils.writeToLocalDisk("file://tmp/output/data", entry.getValue(), new JsonConverter<SumRecordItem>());
+                    if (!cache.isEmpty()) {
+                        for (Map.Entry<Integer, Iterator<SumRecordItem>> entry : cache.entrySet()) {
+                            RDDUtils.writeToLocalDisk("file://tmp/output/data", entry.getValue(), new JsonConverter<SumRecordItem>());
+                        }
                     }
                 });
-
-
         // --- here add Spark Streaming App Logic ---
 
         // here check whether test server setup ok
@@ -105,7 +116,7 @@ public class AppErrorCountJavaStreamingAppSuite implements Serializable {
         Thread.sleep(200);
         // feed test server with Spark App's required dataset format pattern
         // feed data will be stored in the TestServer's queue first
-        int totalMsgCnt = 10;
+        int totalMsgCnt = 10000;
         for (int i = 0; i < totalMsgCnt; i++) {
             testServer.send(String.format("ERROR: number index %s content %s", i, UUID.randomUUID().toString()));
             Thread.sleep(100);
