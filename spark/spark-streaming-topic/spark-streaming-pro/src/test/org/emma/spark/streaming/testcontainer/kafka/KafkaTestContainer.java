@@ -1,4 +1,4 @@
-package org.emma.spark.streaming.testcontainer;
+package org.emma.spark.streaming.testcontainer.kafka;
 
 import com.github.dockerjava.api.command.InspectContainerResponse;
 import org.slf4j.Logger;

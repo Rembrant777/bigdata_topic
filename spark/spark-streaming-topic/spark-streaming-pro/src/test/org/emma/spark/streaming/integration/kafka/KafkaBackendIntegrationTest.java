@@ -16,25 +16,5 @@ import org.testcontainers.utility.DockerImageName;
 public class KafkaBackendIntegrationTest {
     private static final Logger LOG = LoggerFactory.getLogger(KafkaBackendIntegrationTest.class);
 
-    @Container
-    public static GenericContainer<?> zk = new GenericContainer<>(DockerImageName.parse(""))
-            .withExposedPorts();
 
-    @Container
-    public static GenericContainer<?> kafka = new GenericContainer<>(DockerImageName.parse(""))
-            .withExposedPorts();
-
-    @BeforeClass
-    public static void startContainers() {
-        LOG.info("#startContainers start containers");
-        zk.start();
-        kafka.start();
-    }
-
-    @AfterClass
-    public static void stopContainers() {
-        LOG.info("#stopContainers stop containers");
-        zk.stop();
-        kafka.stop();
-    }
 }
