@@ -3,7 +3,6 @@ package org.emma.spark.streaming.testcontainer.kafka;
 import org.rnorth.ducttape.unreliables.Unreliables;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.testcontainers.containers.Container;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.Network;
 import org.testcontainers.lifecycle.Startable;
@@ -97,7 +96,8 @@ public class KafkaContainerCluster implements Startable {
                 // here we attempt to force set the docker image's platform to linux/amd64
                 // to avoid the in-compatibility with MacOs Apple M2 Max
                 .withEnv("DOCKER_DEFAULT_PLATFORM", "linux/amd64")
-                .withExposedPorts(genExposePort(brokersNum))
+               // .withEnv("KAFKA_PORT", String.valueOf(genExposePort(brokerNum + 3)))
+                // .withExposedPorts(genExposePort(brokerNum + 3))
                 .withStartupTimeout(Duration.ofMinutes(1));
 
         LOG.info("#initKafkaContainer ret non-null status {}", Objects.nonNull(ret));
@@ -136,7 +136,6 @@ public class KafkaContainerCluster implements Startable {
                 () -> {
                     return zookeeper.isRunning();
                 });
-
 
         // when zk setup and running then setup kafka containers one by one
         brokers.forEach(GenericContainer::start);
