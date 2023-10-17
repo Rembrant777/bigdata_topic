@@ -29,7 +29,7 @@ public class KafkaContainerIntegrationTest {
             Unreliables.retryUntilTrue(10 * 1000,
                     TimeUnit.SECONDS,
                     () -> {
-                return StringUtils.isNotBlank(cluster.getBootstrapServers())
+                        return cluster.isAllBrokerHealth() && cluster.isAllBrokerRunning();
                     });
 
             String bootstrapServers = cluster.getBootstrapServers();
