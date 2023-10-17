@@ -16,7 +16,7 @@ import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 /**
- * KafkaContainerCluster provides an eaay wao to lanuch Kafka Cluster with multiple brokers.
+ * KafkaContainerCluster provides an easy way to launch Kafka Cluster with multiple brokers.
  */
 public class KafkaContainerCluster implements Startable {
     // how many brokers in total to start

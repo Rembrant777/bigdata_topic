@@ -17,7 +17,7 @@ import static org.emma.spark.streaming.constants.Constants.CONFLUENT_PLATFORM_VE
 public class ZookeeperTestContainer extends GenericContainer<ZookeeperTestContainer> {
     private static final Logger LOG = LoggerFactory.getLogger(ZookeeperTestContainer.class);
 
-    private static final int ZOOKEEPER_INTERNAL_PORT = 2181;
+    public static final int ZOOKEEPER_INTERNAL_PORT = 2181;
     private static final int ZOOKEEPER_TICK_TIME = 2000;
 
     private final String networkAlias = "zookeeper";
@@ -33,6 +33,9 @@ public class ZookeeperTestContainer extends GenericContainer<ZookeeperTestContai
         // export env properties
         env.put("ZOOKEEPER_CLIENT_PORT", Integer.toString(ZOOKEEPER_INTERNAL_PORT));
         env.put("ZOOKEEPER_TICK_TIME", Integer.toString(ZOOKEEPER_TICK_TIME));
+        // here we attempt to force set the docker image's platform to linux/amd64
+        // to avoid the in-compatibility with MacOs Apple M2 Max
+        env.put("DOCKER_DEFAULT_PLATFORM", "linux/amd64");
         withEnv(env);
 
         addExposedPort(ZOOKEEPER_INTERNAL_PORT);
