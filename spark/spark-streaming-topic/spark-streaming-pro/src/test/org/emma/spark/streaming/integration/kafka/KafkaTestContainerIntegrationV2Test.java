@@ -42,7 +42,10 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * Integrated Testing for {@link org.emma.spark.streaming.testcontainer.kafka.KafkaContainerCluster};
+ * <p>
+ * All test cases are moved to {@link KafkaContainerIntegrationTest}, this class will be deprecated.
  */
+@Deprecated
 public class KafkaTestContainerIntegrationV2Test {
     private static final Logger LOG = LoggerFactory.getLogger(KafkaTestContainerIntegrationV2Test.class);
 
