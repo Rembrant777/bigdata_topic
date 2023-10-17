@@ -17,7 +17,7 @@ import static org.emma.spark.streaming.constants.Constants.CONFLUENT_PLATFORM_VE
 public class ZookeeperTestContainer extends GenericContainer<ZookeeperTestContainer> {
     private static final Logger LOG = LoggerFactory.getLogger(ZookeeperTestContainer.class);
 
-    public static final int ZOOKEEPER_INTERNAL_PORT = 2181;
+    private static final int ZOOKEEPER_INTERNAL_PORT = 2181;
     private static final int ZOOKEEPER_TICK_TIME = 2000;
 
     private final String networkAlias = "zookeeper";
@@ -42,12 +42,22 @@ public class ZookeeperTestContainer extends GenericContainer<ZookeeperTestContai
         withNetworkAliases(networkAlias);
     }
 
+    /**
+     * Method that expose connection string for clients to get connect to.
+     */
+    public String getConnectString() {
+        String connectString = this.getHost() + ":"
+                + this.getMappedPort(ZOOKEEPER_INTERNAL_PORT);
+        LOG.info("#getConnectString ret {}", connectString);
+        return connectString;
+    }
+
     public String getInternalUrl() {
         return String.format("%s:%d", networkAlias, ZOOKEEPER_INTERNAL_PORT);
     }
 
     private static String getZookeeperContainerImage(String confluentPlatformVersion) {
-        String zkImageName =  (String) TestcontainersConfiguration
+        String zkImageName = (String) TestcontainersConfiguration
                 .getInstance()
                 .getProperties()
                 .getOrDefault(

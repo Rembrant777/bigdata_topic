@@ -19,7 +19,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
-import static org.emma.spark.streaming.testcontainer.zk.ZookeeperTestContainer.ZOOKEEPER_INTERNAL_PORT;
 
 
 public class ZookeeperTestContainerIntegrationTest {
@@ -100,8 +99,7 @@ public class ZookeeperTestContainerIntegrationTest {
                     return zookeeperTestContainer.isHostAccessible();
                 });
 
-        String connectionStr = zookeeperTestContainer.getHost() + ":"
-                        + zookeeperTestContainer.getMappedPort(ZOOKEEPER_INTERNAL_PORT);
+        String connectionStr = zookeeperTestContainer.getConnectString();
         Assertions.assertTrue(Objects.nonNull(connectionStr) && connectionStr.length() > 0);
         LOG.info("#zookeeperTestCase zk works on {}", connectionStr);
 
