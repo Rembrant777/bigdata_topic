@@ -10,6 +10,7 @@ import org.testcontainers.utility.DockerImageName;
 
 import java.time.Duration;
 import java.util.Collection;
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -31,7 +32,7 @@ public class KafkaContainerCluster implements Startable {
 
     public KafkaContainerCluster(String confluentPlatformVersion, int brokersNum, int internalTopicsRf) {
         if (brokersNum < 0) {
-            throw new IllegalStateException("brokerNum '" + brokersNum  + "' must be greater than 0");
+            throw new IllegalStateException("brokerNum '" + brokersNum + "' must be greater than 0");
         }
 
         if (internalTopicsRf < 0 || internalTopicsRf > brokersNum) {
@@ -103,5 +104,41 @@ public class KafkaContainerCluster implements Startable {
     @Override
     public void stop() {
         allContainers().parallel().forEach(GenericContainer::stop);
+    }
+
+    /**
+     * Method to verify whether all brokers in the kafka cluster are in the state of healthy state.
+     */
+    public boolean isAllBrokerHealth() {
+        return this.brokers.stream()
+                .parallel()
+                .map(this::isBrokerHealth)
+                .collect(Collectors.toList())
+                .size() == this.brokersNum;
+    }
+
+    /**
+     * Method to verify whether all brokers in the kafka cluster are in the state of running.
+     */
+    public boolean isAllBrokerRunning() {
+        return this.brokers.stream()
+                .parallel()
+                .map(this::isBrokerRunning)
+                .collect(Collectors.toList())
+                .size() == this.brokersNum;
+    }
+
+    /**
+     * Method to verify whether the kafka broker is in started && running and also in healthy state.
+     */
+    private boolean isBrokerHealth(KafkaContainer kafkaContainer) {
+        return Objects.nonNull(kafkaContainer) && kafkaContainer.isHealthy();
+    }
+
+    /**
+     * Method to verify whether the kafka broker is in started && running state.
+     */
+    private boolean isBrokerRunning(KafkaContainer kafkaContainer) {
+        return Objects.nonNull(kafkaContainer) && kafkaContainer.isRunning();
     }
 }
