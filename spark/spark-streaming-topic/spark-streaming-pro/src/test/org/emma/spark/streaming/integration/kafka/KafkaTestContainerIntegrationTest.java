@@ -23,9 +23,13 @@ import java.util.concurrent.ExecutionException;
 import java.util.stream.Stream;
 
 /**
- * Integrated Testing for Kafka Cluster
+ * Integration Tests for Kafka Cluster
+ *
+ * Integration Tests for Kafka Cluster based on deprecated self implemented
+ * {@link KafkaTestContainerIntegrationTest}.
  */
-@Testcontainers
+@Deprecated
+// @Testcontainers
 public class KafkaTestContainerIntegrationTest {
     private static final Logger LOG = LoggerFactory.getLogger(KafkaTestContainerIntegrationTest.class);
 

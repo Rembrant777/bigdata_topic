@@ -4,8 +4,6 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.kafka.clients.producer.Partitioner;
 import org.apache.kafka.common.Cluster;
 import org.apache.kafka.common.PartitionInfo;
-import org.apache.spark.util.CollectionsUtils;
-import org.junit.Assert;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,11 +16,13 @@ public class KafkaHashPartitioner implements Partitioner {
     private static final Logger LOG = LoggerFactory.getLogger(KafkaHashPartitioner.class);
     @Override
     public int partition(String topic, Object key, byte[] keyBytes, Object value, byte[] valueBytes, Cluster cluster) {
-        Assert.assertNotNull(cluster);
+        LOG.info("#partition cluster non-null status {}", Objects.nonNull(cluster));
         List<PartitionInfo> partitions = cluster.partitionsForTopic(topic);
         List<PartitionInfo> availablePartitions = cluster.partitionsForTopic(topic);
 
-        Assert.assertTrue(CollectionUtils.isNotEmpty(partitions) && CollectionUtils.isNotEmpty(availablePartitions));
+        LOG.info("#partition collection of partition non-empty status {}," +
+                        " collection of available partition non-empty status {}",
+                Objects.nonNull(partitions), Objects.nonNull(availablePartitions));
         List<Integer> partitionIdSet = null;
 
         if (CollectionUtils.isEqualCollection(partitions, availablePartitions)) {

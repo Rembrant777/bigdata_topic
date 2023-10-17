@@ -1,6 +1,8 @@
 package org.emma.spark.streaming.testcontainer.zk;
 
 import com.google.common.collect.Maps;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.utility.TestcontainersConfiguration;
 
@@ -9,7 +11,12 @@ import java.util.Map;
 
 import static org.emma.spark.streaming.constants.Constants.CONFLUENT_PLATFORM_VERSION;
 
+/**
+ * Customized implemented TestContainer based on abstract class {@link GenericContainer<>}
+ */
 public class ZookeeperTestContainer extends GenericContainer<ZookeeperTestContainer> {
+    private static final Logger LOG = LoggerFactory.getLogger(ZookeeperTestContainer.class);
+
     private static final int ZOOKEEPER_INTERNAL_PORT = 2181;
     private static final int ZOOKEEPER_TICK_TIME = 2000;
 
@@ -37,11 +44,14 @@ public class ZookeeperTestContainer extends GenericContainer<ZookeeperTestContai
     }
 
     private static String getZookeeperContainerImage(String confluentPlatformVersion) {
-        return (String) TestcontainersConfiguration
+        String zkImageName =  (String) TestcontainersConfiguration
                 .getInstance()
                 .getProperties()
                 .getOrDefault(
                         "zookeeper.container.image",
+                        // todo:  --platform linux/amd64
                         "confluentinc/cp-zookeeper:" + confluentPlatformVersion);
+        LOG.info("#getZookeeperContainerImage zkImageName {}", zkImageName);
+        return zkImageName;
     }
 }

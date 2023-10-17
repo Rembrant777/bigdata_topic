@@ -66,7 +66,6 @@ public class KafkaContainerCluster implements Startable {
                                     .withStartupTimeout(Duration.ofMinutes(1));
                         })
                         .collect(Collectors.toList());
-
     }
 
     public Collection<KafkaContainer> getBrokers() {

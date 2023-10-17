@@ -15,7 +15,11 @@ import static org.emma.spark.streaming.constants.Constants.CONFLUENT_PLATFORM_VE
 
 /**
  * Test Container examples not support Kafka Container, try to implement one.
+ *
+ * {@link KafkaTestContainer} already deprecated, cuz testcontainer already implement it in class
+ * {@link org.testcontainers.containers.KafkaContainer} use this one.
  */
+@Deprecated
 public class KafkaTestContainer extends GenericContainer<KafkaTestContainer> {
     private static final Logger LOG = LoggerFactory.getLogger(KafkaTestContainer.class);
 
