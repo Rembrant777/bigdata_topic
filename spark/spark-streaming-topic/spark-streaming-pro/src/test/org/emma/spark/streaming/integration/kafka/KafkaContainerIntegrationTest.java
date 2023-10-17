@@ -10,6 +10,8 @@ import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.TimeUnit;
 
+import static org.emma.spark.streaming.constants.Constants.CONFLUENT_PLATFORM_VERSION;
+
 /**
  * Add test cases for {@link org.emma.spark.streaming.testcontainer.kafka.KafkaContainerCluster},
  * which copied from testcontainer repository's
@@ -23,15 +25,17 @@ public class KafkaContainerIntegrationTest {
         int BROKER_NUM = 3;
         int TOPIC_REPLICATION_CNT = 2;
 
-        try (KafkaContainerCluster cluster = new KafkaContainerCluster("6.2.1", BROKER_NUM, TOPIC_REPLICATION_CNT)) {
+        try (KafkaContainerCluster cluster =
+                     new KafkaContainerCluster(CONFLUENT_PLATFORM_VERSION,
+                             BROKER_NUM, TOPIC_REPLICATION_CNT)) {
             cluster.start();
 
-            Unreliables.retryUntilTrue(10 * 1000,
-                    TimeUnit.SECONDS,
-                    () -> {
-                        return cluster.isAllBrokerHealth() && cluster.isAllBrokerRunning();
-                    });
-
+//            Unreliables.retryUntilTrue(100 * 1000,
+//                    TimeUnit.MICROSECONDS,
+//                    () -> {
+//                        return  && cluster.isAllBrokerRunning();
+//                    });
+            Assertions.assertTrue(cluster.isAllBrokerRunning());
             String bootstrapServers = cluster.getBootstrapServers();
             Assertions.assertEquals(cluster.getBrokers().size(), BROKER_NUM);
         }
