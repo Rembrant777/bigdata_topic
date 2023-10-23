@@ -1,4 +1,4 @@
-package com.emma.netty.bio;
+package deprecated.tobe.deleted.bio;
 
 import java.io.BufferedReader;
 import java.io.IOException;

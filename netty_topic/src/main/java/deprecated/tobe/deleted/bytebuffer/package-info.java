@@ -1,4 +1,4 @@
-package com.emma.netty.bytebuffer;
+package deprecated.tobe.deleted.bytebuffer;
 
 /**
  * In this folder we plan to dive deep into the details and usage of the netty

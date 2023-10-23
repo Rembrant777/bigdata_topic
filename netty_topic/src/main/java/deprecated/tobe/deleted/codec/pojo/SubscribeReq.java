@@ -1,4 +1,4 @@
-package com.emma.netty.codec.pojo;
+package deprecated.tobe.deleted.codec.pojo;
 
 import lombok.Data;
 
