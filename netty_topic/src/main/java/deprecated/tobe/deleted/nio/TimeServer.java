@@ -1,4 +1,4 @@
-package com.emma.netty.nio;
+package deprecated.tobe.deleted.nio;
 
 import java.util.Objects;
 
