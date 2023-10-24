@@ -31,8 +31,8 @@ public abstract class ByteBufAllocatorTest {
 
     @Test
     public void testBuffer() {
-        testBuffer();
-        testBuffer();
+        testBuffer(true);
+        testBuffer(false);
     }
 
     /**
